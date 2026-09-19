@@ -1,8 +1,6 @@
 import {
-  ShieldCheckIcon,
   WifiDisconnected01Icon,
 } from "@hugeicons/core-free-icons";
-import { Badge } from "@/components/ui/badge";
 import { KeyConverter } from "./components/KeyConverter";
 import { Icon } from "./components/Icon";
 import { HeroBackground } from "./components/HeroBackground";

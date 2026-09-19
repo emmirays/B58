@@ -105,8 +105,7 @@ export function KeyConverter() {
 
         <Button
           onClick={handleGenerate}
-          className="group h-auto gap-2 bg-zinc-100 px-4 py-2 font-semibold text-zinc-900 hover:bg-white"
-        >
+          className="group h-auto gap-2 bg-zinc-100 px-4 py-2 font-semibold text-zinc-900 hover:bg-white">
           <Icon
             icon={SparklesIcon}
             size={16}
@@ -119,7 +118,9 @@ export function KeyConverter() {
 
       <div className="mt-6">
         <div className="flex items-center justify-between">
-          <label htmlFor="secret-key-input" className="text-sm font-medium text-zinc-300">
+          <label
+            htmlFor="secret-key-input"
+            className="text-sm font-medium text-zinc-300">
             Private Key Input
           </label>
           <div className="flex items-center gap-3">
@@ -127,8 +128,7 @@ export function KeyConverter() {
               <span
                 className={`inline-flex items-center gap-1 text-xs ${
                   parseResult.ok ? "text-emerald-400" : "text-red-400"
-                }`}
-              >
+                }`}>
                 {parseResult.ok ? (
                   <>
                     <Icon icon={CheckmarkCircle01Icon} />
@@ -147,8 +147,7 @@ export function KeyConverter() {
                 variant="ghost"
                 size="xs"
                 onClick={() => setRawInput("")}
-                className="h-auto px-0 text-zinc-400 hover:bg-transparent hover:text-zinc-100"
-              >
+                className="h-auto px-0 text-zinc-400 hover:bg-transparent hover:text-zinc-100">
                 <Icon icon={Cancel01Icon} className="size-3.5" />
                 Clear
               </Button>
@@ -179,8 +178,7 @@ export function KeyConverter() {
           {hasInput && parseResult && !parseResult.ok && (
             <p
               id="key-error"
-              className="mt-2 flex items-center gap-1.5 text-xs text-red-400"
-            >
+              className="mt-2 flex items-center gap-1.5 text-xs text-red-400">
               <Icon icon={AlertCircleIcon} />
               {parseResult.error}
             </p>
@@ -199,8 +197,7 @@ export function KeyConverter() {
               size="xs"
               onClick={() => setRevealOutput((v) => !v)}
               aria-pressed={revealOutput}
-              className="h-auto px-0 text-zinc-400 hover:bg-transparent hover:text-zinc-100"
-            >
+              className="h-auto px-0 text-zinc-400 hover:bg-transparent hover:text-zinc-100">
               <span className="inline-grid place-items-center">
                 <Icon
                   icon={ViewOffSlashIcon}
@@ -227,13 +224,11 @@ export function KeyConverter() {
         <div
           role="group"
           aria-labelledby="output-label"
-          className="mt-2 flex items-start gap-2 rounded-lg border border-zinc-800 bg-zinc-950/60 p-3"
-        >
+          className="mt-2 flex items-start gap-2 rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
           <p
             className={`min-w-0 flex-1 leading-relaxed break-all font-mono text-sm tracking-wide text-zinc-100 ${
               outputValue && !revealOutput ? "select-none" : ""
-            }`}
-          >
+            }`}>
             {outputValue ? (
               maskedOutput
             ) : (
@@ -258,15 +253,13 @@ export function KeyConverter() {
           <div className="flex items-center justify-between">
             <span
               id="pubkey-label"
-              className="flex items-center gap-1.5 text-sm font-medium text-zinc-300"
-            >
+              className="flex items-center gap-1.5 text-sm font-medium text-zinc-300">
               <Icon icon={Wallet01Icon} size={16} />
               Solana Public Key (Wallet Address)
             </span>
             <Badge
               variant="outline"
-              className="border-zinc-700 bg-zinc-800/60 text-[11px] font-normal text-zinc-400"
-            >
+              className="border-zinc-700 bg-zinc-800/60 text-[11px] font-normal text-zinc-400">
               Public — safe to share
             </Badge>
           </div>
@@ -274,8 +267,7 @@ export function KeyConverter() {
           <div
             role="group"
             aria-labelledby="pubkey-label"
-            className="mt-2 flex items-start gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/4 p-3"
-          >
+            className="mt-2 flex items-start gap-2 rounded-lg border border-emerald-500/20 bg-emerald-500/4 p-3">
             <p className="min-w-0 flex-1 leading-relaxed break-all font-mono text-sm tracking-wide text-emerald-300">
               {keyInfo.publicKeyBase58}
             </p>
@@ -294,8 +286,9 @@ export function KeyConverter() {
           ) : (
             <p className="mt-2 flex items-center gap-1.5 text-xs text-amber-400">
               <Icon icon={Alert02Icon} />
-              Signature check failed — the embedded public key doesn&apos;t match this
-              private key&apos;s seed. Double-check the source of this key.
+              Signature check failed — the embedded public key doesn&apos;t
+              match this private key&apos;s seed. Double-check the source of
+              this key.
             </p>
           )}
         </div>
