@@ -91,7 +91,7 @@ export function secretKeyToBase58(bytes: Uint8Array): string {
   return base58Encode(bytes);
 }
 
-const INTEGRITY_MESSAGE = new TextEncoder().encode("b58.dev-key-integrity-check");
+const INTEGRITY_MESSAGE = new TextEncoder().encode("b58.sh-key-integrity-check");
 
 export interface DerivedKeyInfo {
   publicKeyBytes: Uint8Array;

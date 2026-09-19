@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "B58.dev — Solana Private Key Converter",
+  title: "B58.sh — Solana Private Key Converter",
   description:
     "Convert Solana private keys between CLI JSON arrays and Base58 (Phantom/Backpack) format. 100% client-side, air-gapped, offline-safe.",
 };

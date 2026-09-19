@@ -3,11 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "audit": "pnpm audit --audit-level moderate",
+    "verify:offline": "grep -rniE \"fetch\\(|XMLHttpRequest|navigator\\.send|localStorage|sessionStorage|indexedDB\" app lib components || echo \"No network or storage calls found.\""
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

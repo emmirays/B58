@@ -2,7 +2,7 @@
 
 # B58
 
-**Convert Solana private keys between CLI JSON arrays and Base58 — entirely in your browser.**
+**Convert Solana private keys between CLI JSON arrays and Base58, entirely in your browser.**
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-087ea4?logo=react&logoColor=white)](https://react.dev)
@@ -20,17 +20,19 @@ Phantom and Backpack want a Base58 string. Moving between the two usually means
 pasting your key into a random website and hoping for the best.
 
 B58 does the conversion in your browser and nowhere else. No backend, no API
-route, no analytics, no network request carrying your key. You can read the whole
-thing in a few minutes, and you can run it offline.
+route, no analytics, no network request carrying your key. The whole thing is
+short enough to read in a few minutes, and it runs offline.
 
 ## Contents
 
 - [Features](#features)
 - [Getting started](#getting-started)
+- [Verifying the offline claim](#verifying-the-offline-claim)
 - [How it works](#how-it-works)
 - [Project structure](#project-structure)
 - [Handling private keys safely](#handling-private-keys-safely)
 - [Contributing](#contributing)
+- [Security](#security)
 - [License](#license)
 
 ## Features
@@ -42,7 +44,7 @@ to get a JSON array.
 read as JSON and anything else as Base58. You can also set the direction by hand.
 
 **Explains bad input instead of just rejecting it.** You get the specific
-problem: invalid JSON syntax, the wrong array length, a value outside 0–255
+problem: invalid JSON syntax, the wrong array length, a value outside 0 to 255
 (including which index), a character outside the Base58 alphabet (including its
 position), or a decoded length that isn't 64 bytes.
 
@@ -50,19 +52,20 @@ position), or a decoded length that isn't 64 bytes.
 in Base58, so you can confirm you're holding the key you meant to.
 
 **Verifies the key is internally consistent.** A Solana secret key is 64 bytes: a
-32-byte seed followed by a copy of the 32-byte public key. B58 signs a fixed
+32 byte seed followed by a copy of the 32 byte public key. B58 signs a fixed
 message with the full key and verifies that signature against the embedded public
-key. If the two halves don't belong together, it tells you — rather than quietly
+key. If the two halves don't belong together, it says so, rather than quietly
 displaying an address that can't sign.
 
 **Hides output until you ask for it.** The converted key stays masked behind a
-reveal toggle; copy works either way.
+reveal toggle. Copy works either way.
 
 **Generates a keypair.** Handy for trying the tool out, or for a throwaway key.
 
 ## Getting started
 
-**Prerequisites:** Node.js 20+ (developed on 24) and [pnpm](https://pnpm.io).
+**Prerequisites:** Node.js 20.9 or newer (developed on 24) and
+[pnpm](https://pnpm.io) 11.
 
 ```bash
 git clone https://github.com/emmirays/B58.git
@@ -79,42 +82,66 @@ Open [http://localhost:3000](http://localhost:3000).
 | `pnpm build` | Production build |
 | `pnpm start` | Serve the production build |
 | `pnpm lint` | Run ESLint |
+| `pnpm audit` | Check dependencies for known vulnerabilities |
+| `pnpm verify:offline` | Search the source for network and storage calls |
 
-### Running it offline
+## Verifying the offline claim
 
-The app makes no network calls of its own, so a production build works with no
-connection at all:
+Any key converter can claim it works locally. Here the claim is small enough to
+check yourself, in about a minute.
+
+**1. Search for code that could send data anywhere.**
+
+```bash
+pnpm verify:offline
+```
+
+This greps `app/`, `lib/`, and `components/` for `fetch(`, `XMLHttpRequest`,
+`navigator.send`, `localStorage`, `sessionStorage`, and `indexedDB`. On an
+unmodified checkout it finds nothing, meaning no code path transmits your key or
+writes it to disk. Your key exists only in React state and vanishes when the tab
+closes.
+
+**2. Watch the network yourself.** Open DevTools, switch to the Network tab,
+convert a key, and confirm nothing is sent. Fonts load once at page load and
+nothing else follows.
+
+**3. Cut the connection.** A production build needs no network at all:
 
 ```bash
 pnpm build
-pnpm start   # then disconnect, or use a machine that was never connected
+pnpm start
 ```
 
-Note that `next/font` fetches the Space Grotesk and JetBrains Mono files at build
-time, not at page load — so a build made online runs fine offline afterwards.
+Then turn off networking and use it. `next/font` downloads Space Grotesk and
+JetBrains Mono at build time rather than page load, so a build made online works
+fully offline afterwards. For a key that holds real funds, this is the way to run
+it.
 
 ## How it works
 
-A Solana secret key is 64 bytes. The first 32 are the seed; the last 32 are a
+A Solana secret key is 64 bytes. The first 32 are the seed. The last 32 are a
 copy of the Ed25519 public key derived from that seed. Both of B58's formats
 describe those same 64 bytes:
 
 ```
-JSON    [174, 47, 154, 16, ...]     64 integers, each 0–255
-Base58  4NMwxzmb3j2jT2kT6...       the same bytes, Base58-encoded
+JSON    [174, 47, 154, 16, ...]     64 integers, each 0 to 255
+Base58  4NMwxzmb3j2jT2kT6...        the same bytes, Base58 encoded
 ```
 
-Converting is just re-encoding, which is why it can happen locally with no
-service involved. Two details are worth knowing:
+Converting is only re-encoding, which is why it can happen locally with no
+service involved. Two details are worth knowing.
 
-- **Base58 is implemented in this repo**, not pulled from a package — see
-  [`lib/base58.ts`](lib/base58.ts). It's the standard Bitcoin alphabet, which
-  omits `0`, `O`, `I` and `l` so characters aren't easily confused by eye.
-- **The signature check is real signing.** [`lib/solanaKeys.ts`](lib/solanaKeys.ts)
-  uses [tweetnacl](https://github.com/dchest/tweetnacl-js) to sign a fixed
-  message with the 64-byte key and verify it against the public-key half. That's
-  what catches a key whose two halves disagree — a malformed or hand-edited key
-  can otherwise look valid while being unable to sign anything.
+**Base58 is implemented in this repo** rather than pulled from a package. See
+[`lib/base58.ts`](lib/base58.ts). It uses the standard Bitcoin alphabet, which
+omits `0`, `O`, `I`, and `l` so characters aren't easily confused by eye. One
+fewer dependency in the code path that touches your key.
+
+**The signature check is real signing.** [`lib/solanaKeys.ts`](lib/solanaKeys.ts)
+uses [tweetnacl](https://github.com/dchest/tweetnacl-js) to sign a fixed message
+with the 64 byte key, then verify that signature against the public key half.
+This catches a key whose two halves disagree, which a malformed or hand edited
+key can otherwise hide while being unable to sign anything.
 
 The logic in `lib/` is plain TypeScript with no React in it, so it can be read,
 tested, or reused independently of the UI.
@@ -131,7 +158,7 @@ app/
     GridOverlay.tsx             faint grid over the background
     Icon.tsx                    hugeicons wrapper
 lib/
-  base58.ts                     Base58 encode/decode + alphabet check
+  base58.ts                     Base58 encode and decode, alphabet check
   solanaKeys.ts                 parsing, validation, derivation, generation
 components/
   ui/                           shadcn primitives (button, card, badge, textarea)
@@ -142,24 +169,36 @@ Built with Next.js 16 (App Router, Turbopack), React 19, Tailwind CSS v4, and
 Three.js via [@react-three/fiber](https://github.com/pmndrs/react-three-fiber)
 for the background.
 
+The only dependency that touches key material is
+[tweetnacl](https://github.com/dchest/tweetnacl-js), pinned in `pnpm-lock.yaml`
+with a hash so a later install cannot silently substitute different code. Always
+install with the lockfile committed here rather than resolving versions fresh.
+
 ## Handling private keys safely
 
 A Solana private key is complete control of the funds at that address. Anyone who
-has it can move them, and the transfer can't be reversed.
+has it can move them, and the transfer cannot be reversed.
 
-So treat every key converter with suspicion, this one included:
+So treat every key converter with suspicion, this one included.
 
-- **Read the source before pasting a key that holds real value.** It's short on
-  purpose — [`lib/solanaKeys.ts`](lib/solanaKeys.ts) and
-  [`lib/base58.ts`](lib/base58.ts) are the parts that touch your key.
-- **Prefer a local build over a hosted copy.** Running `pnpm dev` from source you
-  have read is a stronger guarantee than any promise a website makes.
-- **For a key with meaningful funds, use a machine that is offline.**
-- **Watch the URL if you use a hosted version.** Key-converter phishing sites
-  copy real ones closely.
+**Read the source before pasting a key that holds real value.** It's short on
+purpose. [`lib/solanaKeys.ts`](lib/solanaKeys.ts) and
+[`lib/base58.ts`](lib/base58.ts) are the parts that touch your key.
 
-B58 does all of its work client-side — but that's a claim you should verify, not
-accept. The source is here for exactly that reason.
+**Prefer a local build over a hosted copy.** Running from source you have read is
+a stronger guarantee than any promise a website makes. See
+[verifying the offline claim](#verifying-the-offline-claim).
+
+**For a key with meaningful funds, use a machine that is offline.**
+
+**Clear your clipboard when you're done.** The copy button puts your key there,
+and other applications can read it.
+
+**Watch the URL if you ever use a hosted version.** Key converter phishing sites
+copy real ones closely, and a convincing clone costs an attacker very little.
+
+B58 does all of its work client side, but that's a claim you should verify rather
+than accept. The source is here for exactly that reason.
 
 ## Contributing
 
@@ -175,28 +214,33 @@ pnpm lint
 pnpm build
 ```
 
-A few expectations specific to this project:
+A few expectations specific to this project.
 
-- **Keep key handling client-side.** No telemetry, no logging of key material,
-  no new network calls in a code path that can see a key. That constraint is the
-  point of the project.
-- **Keep the `lib/` modules free of React**, so the conversion logic stays
-  readable and testable on its own.
-- **Be careful with crypto changes.** Changes to `base58.ts` or `solanaKeys.ts`
-  need round-trip evidence in the PR description — encode then decode, in both
-  directions, and say what you tested.
+**Keep key handling client side.** No telemetry, no logging of key material, no
+new network calls in a code path that can see a key. That constraint is the point
+of the project, and `pnpm verify:offline` should stay silent.
 
-### Reporting a security problem
+**Keep the `lib/` modules free of React**, so the conversion logic stays readable
+and testable on its own.
 
-If you find a vulnerability, especially one that could expose key material, please
-report it privately rather than opening a public issue. Use GitHub's
-[private vulnerability reporting](https://github.com/emmirays/B58/security/advisories/new)
-on this repository.
+**Be careful with crypto changes.** Changes to `base58.ts` or `solanaKeys.ts`
+need round trip evidence in the PR description. Encode then decode, in both
+directions, and say what you tested.
+
+**Think twice before adding a dependency**, especially anywhere near key
+handling. Every package added there is code a reader has to audit before they can
+trust the tool.
+
+## Security
+
+Found a vulnerability? Please report it privately rather than opening a public
+issue. [SECURITY.md](SECURITY.md) covers how to reach us, what to include, and
+what's in scope.
 
 ## License
 
 [MIT](LICENSE) © Emmanuel Oyiboke
 
-Use it, change it, ship it — just keep the copyright notice. The license also
+Use it, change it, ship it, just keep the copyright notice. The license also
 disclaims warranty and liability, which is worth reading if you plan to run a
 hosted copy for other people.
