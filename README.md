@@ -79,8 +79,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | Script | What it does |
 | --- | --- |
 | `pnpm dev` | Start the dev server (Turbopack) |
-| `pnpm build` | Production build |
-| `pnpm start` | Serve the production build |
+| `pnpm build` | Build a static site into `out/` |
+| `pnpm start` | Serve `out/` locally |
 | `pnpm lint` | Run ESLint |
 | `pnpm audit` | Check dependencies for known vulnerabilities |
 | `pnpm verify:offline` | Search the source for network and storage calls |
@@ -99,14 +99,19 @@ pnpm verify:offline
 This greps `app/`, `lib/`, and `components/` for `fetch(`, `XMLHttpRequest`,
 `navigator.send`, `localStorage`, `sessionStorage`, and `indexedDB`. On an
 unmodified checkout it finds nothing, meaning no code path transmits your key or
-writes it to disk. Your key exists only in React state and vanishes when the tab
+writes it to disk.
+
+The one file it skips is [`lib/githubStars.ts`](lib/githubStars.ts), which reads
+the repo's star count from the GitHub API. It runs only during `pnpm build`,
+never in your browser, and the number is baked into the HTML. Your key exists only in React state and vanishes when the tab
 closes.
 
 **2. Watch the network yourself.** Open DevTools, switch to the Network tab,
 convert a key, and confirm nothing is sent. Fonts load once at page load and
 nothing else follows.
 
-**3. Cut the connection.** A production build needs no network at all:
+**3. Cut the connection.** The site builds to plain static files in `out/`, and
+serving them needs no network at all:
 
 ```bash
 pnpm build
@@ -115,7 +120,8 @@ pnpm start
 
 Then turn off networking and use it. `next/font` downloads Space Grotesk and
 JetBrains Mono at build time rather than page load, so a build made online works
-fully offline afterwards. For a key that holds real funds, this is the way to run
+fully offline afterwards. A build made offline still works; the GitHub button
+just shows no star count. For a key that holds real funds, this is the way to run
 it.
 
 ## How it works

@@ -10,10 +10,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "serve out",
     "lint": "eslint",
     "audit": "pnpm audit --audit-level moderate",
-    "verify:offline": "grep -rniE \"fetch\\(|XMLHttpRequest|navigator\\.send|localStorage|sessionStorage|indexedDB\" app lib components || echo \"No network or storage calls found.\""
+    "verify:offline": "grep -rniE --exclude=githubStars.ts \"fetch\\(|XMLHttpRequest|navigator\\.send|localStorage|sessionStorage|indexedDB\" app lib components || echo \"No network or storage calls found.\""
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -39,6 +39,7 @@
     "@types/three": "^0.186.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "serve": "^14.2.6",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
