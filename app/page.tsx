@@ -46,7 +46,7 @@ export default async function Home() {
             <span className="border-l border-hairline pl-1.5">
               {formatStars.format(stars)}
             </span>
-            <Icon icon={StarIcon} className="group-hover:text-transparent group-hover:fill-[#eab308]" />
+            <Icon icon={StarIcon} className="group-hover:text-transparent fill-transparent group-hover:fill-[#eab308]" />
           </>
         )}
       </a>

@@ -4,7 +4,7 @@ export function Icon({
   icon,
   size = 14,
   strokeWidth = 1.5,
-  fill,
+  fill = "none",
   className,
   ...rest
 }: {
