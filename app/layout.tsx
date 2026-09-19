@@ -14,10 +14,26 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const title = "B58.sh — Solana Private Key Converter";
+const description =
+  "Convert Solana private keys between CLI JSON arrays and Base58 (Phantom/Backpack) format. 100% client-side, air-gapped, offline-safe.";
+
 export const metadata: Metadata = {
-  title: "B58.sh — Solana Private Key Converter",
-  description:
-    "Convert Solana private keys between CLI JSON arrays and Base58 (Phantom/Backpack) format. 100% client-side, air-gapped, offline-safe.",
+  metadataBase: new URL("https://b58-beta.vercel.app"),
+  title,
+  description,
+  openGraph: {
+    type: "website",
+    siteName: "B58.sh",
+    url: "/",
+    title,
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+  },
 };
 
 export default function RootLayout({
