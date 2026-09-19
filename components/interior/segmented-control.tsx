@@ -16,7 +16,8 @@ const SEG =
 
 export type SegmentedOption = {
   value: string;
-  label: string;
+  label: React.ReactNode;
+  srLabel?: string;
   disabled?: boolean;
 };
 
@@ -190,7 +191,7 @@ export function SegmentedControl({
               onPointerEnter={() => !option.disabled && setHovered(i)}
               className="cursor-default rounded-[6px] outline-none focus-visible:bg-[#4568FF]/[0.06] focus-visible:shadow-[inset_0_0_0_1px_#4568FF] dark:focus-visible:bg-emerald-400/[0.08] dark:focus-visible:shadow-[inset_0_0_0_1px_var(--color-emerald-400)]"
             >
-              <span className="sr-only">{option.label}</span>
+              <span className="sr-only">{option.srLabel ?? option.label}</span>
             </button>
           ))}
         </div>

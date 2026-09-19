@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import {
   Alert02Icon,
   AlertCircleIcon,
+  ArrowDataTransferHorizontalIcon,
   Cancel01Icon,
   CheckmarkCircle01Icon,
   KeyRoundIcon,
@@ -32,10 +33,32 @@ import {
 type Mode = "auto" | "json" | "base58";
 type DetectedMode = "json" | "base58" | null;
 
-const MODE_OPTIONS: { value: Mode; label: string }[] = [
+function DirectionLabel({ from, to }: { from: string; to: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      {from}
+      <Icon icon={ArrowDataTransferHorizontalIcon} size={12} aria-hidden />
+      {to}
+    </span>
+  );
+}
+
+const MODE_OPTIONS: {
+  value: Mode;
+  label: React.ReactNode;
+  srLabel?: string;
+}[] = [
   { value: "auto", label: "Auto-detect" },
-  { value: "json", label: "JSON → Base58" },
-  { value: "base58", label: "Base58 → JSON" },
+  {
+    value: "json",
+    label: <DirectionLabel from="JSON" to="Base58" />,
+    srLabel: "JSON to Base58",
+  },
+  {
+    value: "base58",
+    label: <DirectionLabel from="Base58" to="JSON" />,
+    srLabel: "Base58 to JSON",
+  },
 ];
 
 const PLACEHOLDERS: Record<Mode, string> = {
